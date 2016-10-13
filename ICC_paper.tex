@@ -310,12 +310,33 @@ The following subsections describe the problem and two algorithms adopted in thi
 The training data is a dataset \(S\) of event sequences. Each sequence belongs to a device ID and a specific time interval, while each event consists of a timestamp and a message ID. The pattern definition in this work is a subsequence of message IDs that appear in the sequences of \(S\).% The goal is to identify all patterns in the dataset having some predefined characteristics. 
 The mentioned concurrency and noise specifications of the log sequences hinder the pattern discovery task since the events of the same pattern might not be contiguous: e.g. noisy or concurrent events might overlap with the pattern to be discovered. This means that all the events of a pattern will not always appear in the same relative positions to each other.
 \subsubsection{Sequential-Pattern Discovery}
-The first algorithm adopted to find patterns is based on the sequential rule mining algorithm \cite{algorithms}.
-However, since this algorithm discovers the frequent correlated patterns only, it has been modigied in order to cover the infrequent mutually dependent patterns as well. 
+The first algorithm adopted to find patterns is based on the sequential rule mining (SRM) algorithm \cite{algorithms}.
+However, since this algorithm discovers the frequent correlated patterns only, it has been modified in order to cover the infrequent mutually dependent patterns as well. 
 Originally, the original algorithm discovers patterns having a given minimum support and confidence \(minSup\) and \(minConf\) respectively.
-The new algorithm, called Sequential-Pattern-discovery or SPD is described in fig.\ref{SPD}.
+The new algorithm, called Sequential-Pattern-discovery or SPD is described in alg.\ref{SPD}.
 It uses several instances of the original algorithm to discover frequent patterns, store them, remove them from the data, decrease the minSup threshold and then go back to the first step.
 The process keeps iterating until a \[minSup == 0 \] is reached.
+
+
+
+\begin{algorithm}
+\caption{Sequential Pattern Discovery Algorithm}\label{SPD}
+\begin{algorithmic}[1]
+\Procedure{SPD}{D, minConf}
+\State $S \gets  \emptyset$
+\State $\textit{minSup} \gets \textit{size} (D)$
+\While {$\textit{minSup} \geq  0$}
+\State $N \gets$  SRM $(D, minSup, minConf)$
+\State $S \gets S \cup N$
+\For {$p$ in $N$}
+\State Remove all occurrences of  $p$ in $D$
+\EndFor
+\State \textit{minSup} $\gets$ \textit{minSup} $¿ 10\% \times$ size(D)
+\EndWhile
+\State	return $S$
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
 
 \subsubsection{Interesting-Pattern Discovery}
 
