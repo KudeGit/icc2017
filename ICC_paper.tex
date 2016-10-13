@@ -284,15 +284,20 @@ In order to identify anomaly, we focus on a specific network configuration. For 
 We consider a typical enterprise or campus wireless access network. Usually a single Cisco Wireless Controller as the Cisco 8540 Wireless Controller or the Cisco Catalyst 3850 can support thousand of Access Points (AP) and ten of thousands of clients~\cite{WLC-datasheets-site}. To simplify configurations and management, 
 We consider lightweight APs, i.e., APs cannot act independently of a wireless controller (RFC 5412). In order to monitor and identify issues with this network while minimizing the amount of data processed, we focus on the data collected by the WLC. Collecting data on the WLC also void synchronization issues as well as .... 
 
-We focus mainly on parisng and analysing the network logs. This is because global show commands usually show a summarized information, in precise time instant 
-\subsection{Problem statement}
 We focus mainly on parsing and analyzing the network logs. This is because global show commands usually show a specific summarized information, in precise time instant. On the other hand, the log files cover the whole sequence of events occurring in the network. Due to their complexity and lengths, the log files are hard to be processed by a human being. However, our hypothesis is that machine learning can help us find the interesting information efficiently from these log files. In our case, we are interested in detecting abnormal sequences of network events.
-
+\subsection{Problem statement}
 In order to formulate the problem, we introduce some notations and definitions. First, we consider that every log entry represents a network event. A log entry \textbf{\textit{x}} consists of a timestamp \(t_x\), a list of mac addresses \(d_x\) of the devices involved in the event and a message \(m_x\) describing the action that took place. In the preprocessing phase, we assign a unique ID \textbf{\textit{ID}} for every possible action. Then, we map every message to the corresponding \textbf{\textit{ID}}. An event \(e_x\) is thus defined as the tuple containing the timestamp, the mac address list and the event ID corresponding to the log entry x:
 \[e_x = (t_x,d_x,ID_x)\]
 We also denote the ordered sequence s of n consecutive events by:
 \[s = <e_1,e_2, ... e_n>\]
-In this project, the sequences to be labeled are derived based on the mac address involved in the event. In other words, for every mac address that appears in the logs, we construct a sequence of events in which it is involved. Thus, for a dataset where m mac addresses are seen, m sequences are constructed and processed. 
+In this project, the sequences to be labeled are derived based on the mac address involved in the event. In other words, for every mac address that appears in the logs, we construct a sequence of events in which it is involved. Thus, for a dataset where m mac addresses are seen, m sequences are constructed and processed. We denote the sequence corresponding to the mac address \textbf{\textit{i}} by: 
+\[s_i = <\forall e_x | i \in d_x> \]
+
+Depending on the activity of the corresponding device, the sequence might have gaps in which consecutive events are not contiguous. Therefore, each of the sequences is split into contiguous subsequences. We denote a contiguous subsequence by \(s'_{i,j}\) where i is the corresponding mac address and j is the order of the subsequence. 
+
+Based on the previous definitions, We formally define the problem as follows. Given the set of all contiguous subsequences derived from the logs, we need to identify the abnormal subsequences. 
+
+
 
 
 
@@ -497,4 +502,3 @@ Future work: noise resilient, anomaly classification
 % \end{thebibliography}
 
 \end{document}
-
