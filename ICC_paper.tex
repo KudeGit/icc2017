@@ -248,7 +248,7 @@ With the growing demand for wireless connectivity, enterprises are investing mor
 % no \IEEEPARstart
 With the explosion of the number of smartphone and wireless device connected to the Internet, WiFi network becomes one of the most critical network segment. According to reports published by Dimension Data, network access ports were 80\% wired and 20\% wireless in 2013. With the wireless access overtaking the wired access, the same source also predicted that the access ports will eventually become 20\%wired and 80\% wireless in a couple of years [1]. Nowadays, large enterprises such as universities and big companies, can have up to thousands of access points (AP) managed under the same network. Consequently, maintaining and assuring a good health of the network become crucial, critical and challenging. In this context, timely identifying issues in the wireless context is of primary importance to ensure the required quality of experience for users. However, the large number of 802.11 protocols, their complex state machine and the variance of the wireless medium make this task even harder than usual. 
 
-Numerous networking issues are reported to networksâ€™ administrators daily. Although there exist tens of useful troubleshooting tools, diagnosing network problems has always been a challenging task. Furthermore, as the network size, its complexity, and the number of features it supports increases, the number of dimensions a network engineer has to consider while solving a problem drastically increases. This puts more pressure on the task of monitoring and solving network issues. Few examples of the features needed to be considered are physical connectivity, network configuration, router configurations and status (queue status, CPU load, memory usage, etcâ€¦), network protocolsâ€™ state machines and the interaction between the application layer and the network layer. Therefore, network troubleshooting usually requires skilled network engineers that leverage years of experience.
+Numerous networking issues are reported to networks’ administrators daily. Although there exist tens of useful troubleshooting tools, diagnosing network problems has always been a challenging task. Furthermore, as the network size, its complexity, and the number of features it supports increases, the number of dimensions a network engineer has to consider while solving a problem drastically increases. This puts more pressure on the task of monitoring and solving network issues. Few examples of the features needed to be considered are physical connectivity, network configuration, router configurations and status (queue status, CPU load, memory usage, etc…), network protocols’ state machines and the interaction between the application layer and the network layer. Therefore, network troubleshooting usually requires skilled network engineers that leverage years of experience.
 
 In a typical scenario When network users experience a network problem, they usually contact the network administrator who starts investigating the network logs in order to understand what happened. However, the large number of logs and the concurrency feature of wireless networks make this task quite complex.
 
@@ -266,7 +266,7 @@ Automated troubleshooting for wired networks is not a new topic. Many studies ta
 
 A research in [8] studies the effect of media access dynamics, mobility management and 802.11 protocols on the network performance from the perspective of the physical layer to the transport layer. The authors built an automated tool that collects measurements of delays using a pre-installed infrastructure of APs for testing. The tool uses these measurements along with several trained models to infer hidden delays and detect their sources.
 
-Two famous solutions for wireless enterprise network monitoring and troubleshooting are WifiProfiler [9] and DAIR [10]. Both solutions detect wireless problems and predict the network performance using data collected from the clientâ€™s perspective without assuming any special capabilities in the infrastructure. However, the main disadvantage of these solutions is that they are instrumented to test for specific anomalies. They do not use any artificial intelligence or machine learning technique.
+Two famous solutions for wireless enterprise network monitoring and troubleshooting are WifiProfiler [9] and DAIR [10]. Both solutions detect wireless problems and predict the network performance using data collected from the client’s perspective without assuming any special capabilities in the infrastructure. However, the main disadvantage of these solutions is that they are instrumented to test for specific anomalies. They do not use any artificial intelligence or machine learning technique.
 
 While log analysis is not widely used in network troubleshooting, it has been immensely used to understand the behaviors of other computer systems. In some studies such as [13,14], the common feature extraction techniques, used in the natural language processing field, were applied to classify log files.
 
@@ -276,9 +276,16 @@ In this project, we combine both log analysis approaches, the pattern discovery 
 
 \section{Problem overview}
 We consider a typical enterprise or campus wireless access network composed by thousands of Access Points (AP).
-Usually the scale suppoted by a single Cisco Wireless Controller {\bf DC: need the name of the product.}. We consider lightweight APs, i.e., APs cannot act independently of a wireless controller (RFC 5412). In order to monitor and identify issues with this network while minimizing the amount of data processed, we focus on the data collected by the WLC. Collecting data on the WLC also void synchronization issues as well as .... 
+Usually the scale supported by a single Cisco Wireless Controller (WLC) {\bf DC: need the name of the product.}. We consider lightweight APs, i.e., APs cannot act independently of a wireless controller (RFC 5412). In order to monitor and identify issues with this network while minimizing the amount of data processed, we focus on the data collected by the WLC. Collecting data on the WLC also void synchronization issues as well as .... 
 
-We focus mainly on parisng and analysing the network logs. This is because global show commands usually show a summarized information, in precise time instant 
+We focus mainly on parsing and analyzing the network logs. This is because global show commands usually show a specific summarized information, in precise time instant. On the other hand, the log files cover the whole sequence of events occurring in the network. Due to their complexity and lengths, the log files are hard to be processed by a human being. However, our hypothesis is that machine learning can help us find the interesting information efficiently from these log files. In our case, we are interested in detecting abnormal sequences of network events.
+
+In order to formulate the problem, we introduce some notations and definitions. First, we consider that every log entry represents a network event. A log entry \textbf{\textit{x}} consists of a timestamp \(t_x\), a list of mac addresses \(d_x\) of the devices involved in the event and a message \(m_x\) describing the action that took place. In the preprocessing phase, we assign a unique ID \textbf{\textit{ID}} for every possible action. Then, we map every message to the corresponding \textbf{\textit{ID}}. An event \(e_x\) is thus defined as the tuple containing the timestamp, the mac address list and the event ID corresponding to the log entry x:
+\[e_x = (t_x,d_x,ID_x)\]
+We also denote the ordered sequence s of n consecutive events by:
+\[s = <e_1,e_2, ... e_n>\]
+In this project, the sequences to be labeled are derived based on the mac address involved in the event. In other words, for every mac address that appears in the logs, we construct a sequence of events in which it is involved. Thus, for a dataset where m mac addresses are seen, m sequences are constructed and processed. 
+
 
 
 \section{Model and Methodology}
@@ -418,5 +425,4 @@ Future work: noise resilient, anomaly classification
 % \end{thebibliography}
 
 \end{document}
-
 
