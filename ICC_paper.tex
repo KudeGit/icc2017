@@ -275,13 +275,23 @@ In other log analysis studies, log files are used to study certain event correla
 In this project, we combine both log analysis approaches, the pattern discovery and the feature extraction methods. The discovered patterns are used as features to learn the different behaviors in the network and detect anomalies.
 
 \section{Problem overview}
-We consider a typical enterprise or campus wireless access network composed by thousands of Access Points (AP).
-Usually the scale suppoted by a single Cisco Wireless Controller {\bf DC: need the name of the product.}. We consider lightweight APs, i.e., APs cannot act independently of a wireless controller (RFC 5412). In order to monitor and identify issues with this network while minimizing the amount of data processed, we focus on the data collected by the WLC. Collecting data on the WLC also void synchronization issues as well as .... 
+In order to identify anomaly, we focus on a specific network configuration. For this network topology we collect logs, that we analyze in order to idetify anomalies.
+
+\subsection{Network architecture}
+We consider a typical enterprise or campus wireless access network. Usually a single Cisco Wireless Controller as the Cisco 8540 Wireless Controller or the Cisco Catalyst 3850 can support thousand of Access Points (AP) and ten of thousands of clients~\cite{WLC-datasheets-site}. To simplify configurations and management, 
+We consider lightweight APs, i.e., APs cannot act independently of a wireless controller (RFC 5412). In order to monitor and identify issues with this network while minimizing the amount of data processed, we focus on the data collected by the WLC. Collecting data on the WLC also void synchronization issues as well as .... 
 
 We focus mainly on parisng and analysing the network logs. This is because global show commands usually show a summarized information, in precise time instant 
+\subsection{Problem statement}
 
 
 \section{Model and Methodology}
+\subsection{Pattern discovery}
+\subsection{Sequence learning}
+\subsection{Learning algorithm}
+
+
+
 \section{Testing and Results}
 \section{Conclusions}
 Stress main idea. Usage and impact. Alternatives and future work.\\
