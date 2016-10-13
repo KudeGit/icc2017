@@ -1,4 +1,7 @@
 \documentclass[conference]{IEEEtran}
+\usepackage{amsmath}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
 %\documentclass{sig-alternate}
 % Some Computer Society conferences also require the compsoc mode option,
 % but others use the standard conference format.
@@ -295,6 +298,27 @@ In this project, the sequences to be labeled are derived based on the mac addres
 
 \section{Model and Methodology}
 \subsection{Pattern discovery}
+In the context of this work, pattern discovery basically aims at finding interesting relations among the variables in the large log data. To the best of our knowledge, none of the previous works described in sec.\ref{sec:related} combine the results of the pattern discovery solutions with any learning algorithm to train a machine to understand the data.
+The approach taken here is to adopt discovered patterns instead of traditional features in the learning phase. 
+Patterns have to be of frequently correlated and mutually dependent events, such that, in the presence of issues, a clear cause-effect determinism can be underlined. 
+This decision allows for dimensionality reduction and human readability.
+Indeed, one of the wanted outcome of this work is highlighting sequences of interesting (i.e. problematic) logs to humans in order to help better debugging.
+
+% Our hypothesis is that if we use the discovered patterns instead of using the traditional features only in the learning process we will get better results. Hence, after the preprocessing phase and just before the learning phase we add a pattern discovery step.
+The following subsections describe the problem and two algorithms adopted in this work to address it.  
+\subsubsection{Finding patterns in wireless controller logs}
+The training data is a dataset \(S\) of event sequences. Each sequence belongs to a device ID and a specific time interval, while each event consists of a timestamp and a message ID. The pattern definition in this work is a subsequence of message IDs that appear in the sequences of \(S\).% The goal is to identify all patterns in the dataset having some predefined characteristics. 
+The mentioned concurrency and noise specifications of the log sequences hinder the pattern discovery task since the events of the same pattern might not be contiguous: e.g. noisy or concurrent events might overlap with the pattern to be discovered. This means that all the events of a pattern will not always appear in the same relative positions to each other.
+\subsubsection{Sequential-Pattern Discovery}
+The first algorithm adopted to find patterns is based on the sequential rule mining algorithm \cite{algorithms}.
+However, since this algorithm discovers the frequent correlated patterns only, it has been modigied in order to cover the infrequent mutually dependent patterns as well. 
+Originally, the original algorithm discovers patterns having a given minimum support and confidence \(minSup\) and \(minConf\) respectively.
+The new algorithm, called Sequential-Pattern-discovery or SPD is described in fig.\ref{SPD}.
+It uses several instances of the original algorithm to discover frequent patterns, store them, remove them from the data, decrease the minSup threshold and then go back to the first step.
+The process keeps iterating until a \[minSup == 0 \] is reached.
+
+\subsubsection{Interesting-Pattern Discovery}
+
 \subsection{Sequence learning}
 \subsection{Learning algorithm}
 
