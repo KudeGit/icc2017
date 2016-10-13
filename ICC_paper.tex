@@ -324,14 +324,14 @@ The process keeps iterating until a \[minSup == 0 \] is reached.
 \begin{algorithmic}[1]
 \Procedure{SPD}{D, minConf}
 \State $S \gets  \emptyset$
-\State $\textit{minSup} \gets \textit{size} (D)$
-\While {$\textit{minSup} \geq  0$}
-\State $N \gets$  SRM $(D, minSup, minConf)$
+\State minSup $\gets \textit{size} (D)$
+\While {minSup $\geq  0$}
+\State $N \gets$  SRM (D, minSup, minConf)
 \State $S \gets S \cup N$
 \For {$p$ in $N$}
 \State Remove all occurrences of  $p$ in $D$
 \EndFor
-\State \textit{minSup} $\gets$ \textit{minSup} $¿ 10\% \times$ size(D)
+\State minSup $\gets$ minSup $¿ 10\% \times$ size(D)
 \EndWhile
 \State	return $S$
 \EndProcedure
@@ -339,7 +339,23 @@ The process keeps iterating until a \[minSup == 0 \] is reached.
 \end{algorithm}
 
 \subsubsection{Interesting-Pattern Discovery}
+Another approach adopted in this paper is based on both sequential rule and interesting rule mining.
+We use the SRM algorithm to extract frequent correlated patterns and then we use the apriori algorithm with the all confidence metric, which we call original interesting pattern discovery algorithm(OIPD), to extract mutually dependent patterns.
+ 
+Both algorithms combined produce the Interesting-Pattern-Discovery (IPD) algorithm whose pseudocode is listed in alg.\ref{IPD}.
 
+\begin{algorithm}
+\caption{Interesting Pattern Discovery Algorithm}\label{IPD}
+\begin{algorithmic}[1]
+\Procedure{IPD}{D, minConf, minSup, minAllConf}
+\State $S \gets$  SRM (D, minSup, minConf)
+\State $N \gets$  OIPD (D, minallConf)
+\State $S \gets S \cup N$
+\State	return $S$
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+ 
 \subsection{Sequence learning}
 \subsection{Learning algorithm}
 
