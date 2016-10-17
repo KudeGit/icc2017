@@ -240,7 +240,13 @@ Lorenzo Granai\IEEEauthorrefmark{2}
 % As a general rule, do not put math, special symbols or citations
 % in the abstract
 \begin{abstract}
-With the growing demand for wireless connectivity, enterprises are investing more in supporting wireless access in their large scale networks. However, the deployment of wireless access introduces a new level of complexity and opens the door for new problems in the network. While manual troubleshooting is time consuming and requires much experience, an indispensable need for smart automated troubleshooting is emerging . In this paper, a machine learning solution is proposed to automate anomaly detection in wireless networks. The solution uses the network logs to derive sequences of network events in real-time. Two sequence learning techniques are then applied and combined to detect abnormal sequences of network events. These methods use a novel combination of features and distance metric compatible with the unstructured nature of the sequences. Furthermore, F-scores and ROC curves are used to compare the performances of different models. Finally, this paper presents real case scenarios where this innovative approach improves network management by automatically gaining real-time useful information on wireless networks status.
+With the growing demand for wireless connectivity, enterprises are investing more in supporting wireless access in their large scale networks. However, the deployment of wireless access introduces a new level of complexity and hence opens the door for new problems in the network.
+Since manual troubleshooting is time consuming and requires a great extent of experience, an indispensable need for smart automated troubleshooting is emerging.
+In this paper, a machine learning solution is proposed to automate anomaly detection in wireless networks. The solution uses network logs to derive sequences of network events in real-time.
+Two sequence learning techniques are then applied and combined to detect abnormal sequences of network events.
+These methods use a novel combination of features and distance metric compatible with the unstructured nature of the sequences.
+F-scores and ROC curves are used to compare the performances of different models in a real network environment.
+Finally, this paper presents real case scenarios where this innovative approach improves network management by automatically gaining real-time useful information on wireless networks status.
 
 \end{abstract}
 
@@ -249,15 +255,24 @@ With the growing demand for wireless connectivity, enterprises are investing mor
 
 \section{Introduction}
 % no \IEEEPARstart
-With the explosion of the number of smartphone and wireless device connected to the Internet, WiFi network becomes one of the most critical network segment. According to reports published by Dimension Data, network access ports were 80\% wired and 20\% wireless in 2013. With the wireless access overtaking the wired access, the same source also predicted that the access ports will eventually become 20\%wired and 80\% wireless in a couple of years [1]. Nowadays, large enterprises such as universities and big companies, can have up to thousands of access points (AP) managed under the same network. Consequently, maintaining and assuring a good health of the network become crucial, critical and challenging. In this context, timely identifying issues in the wireless context is of primary importance to ensure the required quality of experience for users. However, the large number of 802.11 protocols, their complex state machine and the variance of the wireless medium make this task even harder than usual. 
+With the explosion of the number of smartphone and wireless device connected to the Internet, WiFi network becomes one of the most critical network segment. According to reports published by Dimension Data \cite{forecast}, network accesses were 80\% wired and 20\% wireless in 2013. With the wireless access overtaking the wired access, the same source predicts that the percentages will eventually become 20\%wired and 80\% wireless in a couple of years.
+Nowadays, large enterprises such as universities and big companies, can have up to thousands of access points (AP) managed under the same network. Consequently, maintaining and assuring a good health of the network become crucial, critical and challenging. In this context, timely identifying issues in the wireless context is of primary importance to ensure the required quality of experience for users. However, the large number of 802.11 protocols, their complex state machine and the variance of the wireless medium make this task even harder than usual. 
 
-Numerous networking issues are reported to networks’ administrators daily. Although there exist tens of useful troubleshooting tools, diagnosing network problems has always been a challenging task. Furthermore, as the network size, its complexity, and the number of features it supports increases, the number of dimensions a network engineer has to consider while solving a problem drastically increases. This puts more pressure on the task of monitoring and solving network issues. Few examples of the features needed to be considered are physical connectivity, network configuration, router configurations and status (queue status, CPU load, memory usage, etc…), network protocols’ state machines and the interaction between the application layer and the network layer. Therefore, network troubleshooting usually requires skilled network engineers that leverage years of experience.
+Numerous networking issues are reported to networks administrators daily. 
+Although there exist tens of useful troubleshooting tools, diagnosing network problems has always been a challenging task
+Furthermore, as the network size, its complexity, and the number of features it supports increase, the troubleshooting problem dimensions grow with them. %making the task incredibly hard for network engineers.
+Few examples of the elements needed to be analysed by network engineers while troubleshooting wireless network are physical connectivity, network devices' configuration, routers' configurations and operational status (queue levels, CPU load, memory usage, etc...), network protocols state machines and the interaction between the application layer and the network layer. Therefore, network troubleshooting usually requires skilled network engineers that leverage years of experience.
 
-In a typical scenario When network users experience a network problem, they usually contact the network administrator who starts investigating the network logs in order to understand what happened. However, the large number of logs and the concurrency feature of wireless networks make this task quite complex.
+In a typical scenario when network users experience a network problem, they usually contact the network administrator who starts investigating the network logs in order to understand what happened. However, the large number of logs and the concurrency feature of wireless networks make this task quite complex.
 
-In this context, machine learning techniques can help in automating the log analysis task. Nowadays, the trend is to make the machine learn by itself how to assess the situation in the system by using available data. This technique is very efficient, especially when big data is available since the machine processes the data much faster than a human. The network logs, being a rich source of data, is then a potential source of useful data that can be used in automating network troubleshooting.
+In this context, machine learning techniques can help in automating the log analysis task.
+Nowadays, the trend is to make the machine learn by itself how to assess the situation in the system by using available data.
+This technique is very efficient, especially when big data is available since the machine processes the data much faster than a human. %The network logs, being a rich source of data, is then a potential source of useful data that can be used in automating network troubleshooting.
 
-Therefore, in this paper we study the possibility of building a machine learning solution that can identify network anomalies automatically without human intervention. In the proposed solution, the machine processes the network logs in real-time and monitors the behavior of the network. Whenever an anomaly is detected, it informs the administrator and points her to the logs reflecting the anomaly. With this solution, the administrator can proactively take some action to limit the window of time in which users perceive some connectivity problems instead of inspecting the problem.
+In this paper we study the possibility of building a machine learning solution that can identify network anomalies automatically without human intervention by learning from network logs. In the proposed solution, the machine processes the network logs in real-time and monitors the behavior of the network.
+Whenever an anomaly is detected, it informs the administrator and points her to the logs reflecting the anomaly.
+With this solution, the administrator can proactively take some action to limit the perceived effect of the anomaly instead of inspecting the problem.
+%window of time in which users perceive some connectivity problems instead of inspecting the problem.
 
 
 The paper is organized as follows. In Section \ref{sec:related}, we provide a concise summary of
@@ -313,7 +328,7 @@ The mentioned concurrency and noise specifications of the log sequences hinder t
 The first algorithm adopted to find patterns is based on the sequential rule mining (SRM) algorithm \cite{algorithms}.
 However, since this algorithm discovers the frequent correlated patterns only, it has been modified in order to cover the infrequent mutually dependent patterns as well. 
 Originally, the original algorithm discovers patterns having a given minimum support and confidence \(minSup\) and \(minConf\) respectively.
-The new algorithm, called Sequential-Pattern-discovery or SPD is described in alg.\ref{SPD}.
+The new algorithm, called Sequential Pattern discovery or SPD is described in alg.\ref{SPD}.
 It uses several instances of the original algorithm to discover frequent patterns, store them, remove them from the data, decrease the minSup threshold and then go back to the first step.
 The process keeps iterating until a $minSup == 0$ is reached.
 
@@ -338,11 +353,11 @@ The process keeps iterating until a $minSup == 0$ is reached.
 \end{algorithmic}
 \end{algorithm}
 
-\subsubsection{Interesting-Pattern Discovery}
+\subsubsection{Interesting Pattern Discovery}
 Another approach adopted in this paper is based on both sequential rule and interesting rule mining.
-We use the SRM algorithm to extract frequent correlated patterns and then we use the apriori algorithm with the all confidence metric, which we call original interesting pattern discovery algorithm(OIPD), to extract mutually dependent patterns.
+We use the SRM algorithm to extract frequent correlated patterns and then we use the apriori algorithm with the all confidence metric, which we call original interesting pattern discovery algorithm (OIPD), to extract mutually dependent patterns.
  
-Both algorithms combined produce the Interesting\-Pattern\-Discovery (IPD) algorithm whose pseudocode is listed in alg.\ref{IPD}.
+Both algorithms combined produce the Interesting Pattern Discovery (IPD) algorithm whose pseudocode is listed in alg.\ref{IPD}.
 
 \begin{algorithm}
 \caption{Interesting Pattern Discovery Algorithm}\label{IPD}
