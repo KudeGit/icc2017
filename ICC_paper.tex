@@ -373,6 +373,18 @@ Both algorithms combined produce the Interesting Pattern Discovery (IPD) algorit
 \end{algorithm}
  
 \subsection{Sequence learning}
+Due to the unstructured nature of the data, sequence learning is not a trivial task. The data does not have explicit features that the conventional machine learning techniques exploit to induce the model. In order to overcome this issue, we introduce the following methods.
+
+1) The feature creation method: In this methodology, we extract a set of quantitative features from the sequences. The learning process then uses these feature to create the model and label the samples. Thus, choosing the right  feature set is very crucial to detecting the abnormal sequences. This method is very common in the document classification problem. Dozens of feature creation techniques were invented and tested in previous studies in order to achieve higher accuracy in document classification. Therefore, we adapted the two most common feature sets (i \& ii below) to the sequence learning problem and tested their accuracy in detecting anomalies. Moreover, we investigated the effect of another feature set (iii) that leverages on the timestamp information. Last but not least, we introduce a novel feature set (iv) that makes use of the the discovered patterns discussed in section IV.A. 
+
+i) Term frequency: In the document classification problem, term frequency TF(t,d) of a term t in a document d is the number of occurrences of t in d. In order to make this feature set compatible with our setup, we compute the event ID frequency EF(\(e_{ID}\),s) that expresses the number of occurrences of the event ID \(e_{ID}\) in the sequence s.
+
+ii) N-gram frequency: In the document classification problem, an n-gram is a sequence of n consecutive words appearing in the document. Similarly to the term frequency, the n-gram frequency counts the occurrences of n-grams in the sample. Instead of counting n-grams of words, in this project we counted n-grams of event IDs. Therefore, the n-gram frequency NF(N,s) becomes the number of occurrences of an n-gram N in the sequence s.
+
+iii) Timestamp statistics: It is widely believed that timestamps contain a great amount of useful information for log analysis [13]. The epochs between events tell a lot about the type of the behavior. However, they cannot be directly used as explicit features since the sequences might have different lengths. Hence, statistics about the time difference between consecutive events are derived and used as features instead. These statistics consist of the mean, the standard deviation, the sum, the maximum and the minimum of the time differences between consecutive events.
+
+iv) Pattern frequency: This feature is also similar to the term frequency, however the items to be counted are the patterns discovered in the pattern discovery phase. Hence, the pattern frequency PF(p,s) is the number of occurrences of pattern p in the sequence s. Since the pattern discovery processes described in section IV.A are designed to retrieve highly informative patterns, we believe that this set of feature might improve the accuracy of the anomaly detection.
+
 \subsection{Learning algorithm}
 
 
@@ -510,4 +522,3 @@ Future work: noise resilient, anomaly classification
 \bibliography{ICC_paper}
 
 \end{document}
-
