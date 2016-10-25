@@ -2,6 +2,7 @@
 \usepackage{amsmath}
 \usepackage{algorithm}
 \usepackage{filecontents}
+\usepackage{graphicx}
 \usepackage[noend]{algpseudocode}
 %\documentclass{sig-alternate}
 % Some Computer Society conferences also require the compsoc mode option,
@@ -302,30 +303,81 @@ We consider lightweight APs, i.e., APs cannot act independently of a wireless co
 
 We focus mainly on parisng and analysing the network logs. This is because global show commands usually show a summarized information, in precise time instant 
 \subsection{Problem statement}
-We focus mainly on parsing and analyzing the network logs. This is because global show commands usually show a specific summarized information, in precise time instant. On the other hand, the log files cover the whole sequence of events occurring in the network. Due to their complexity and lengths, the log files are hard to be processed by a human being. However, our hypothesis is that machine learning can help us find the interesting information efficiently from these log files. In our case, we are interested in detecting abnormal sequences of network events.
+We focus mainly on parsing and analyzing the network logs. This is because global show commands usually show a specific summarized information, in precise time instant. On the other hand, the log files cover the whole sequence of events occurring in the network. Due to their complexity and lengths, the log files are hard to be processed by a human being. Machine learning can help network administrator to deduce interesting information efficiently from these log files. 
 
-In order to formulate the problem, we introduce some notations and definitions. First, we consider that every log entry represents a network event. A log entry \textbf{\textit{x}} consists of a timestamp \(t_x\), a list of mac addresses \(d_x\) of the devices involved in the event and a message \(m_x\) describing the action that took place. In the preprocessing phase, we assign a unique ID \textbf{\textit{ID}} for every possible action. Then, we map every message to the corresponding \textbf{\textit{ID}}. An event \(e_x\) is thus defined as the tuple containing the timestamp, the mac address list and the event ID corresponding to the log entry x:
-\[e_x = (t_x,d_x,ID_x)\]
-We also denote the ordered sequence s of n consecutive events by:
-\[s = <e_1,e_2, ... e_n>\]
-In this project, the sequences to be labeled are derived based on the mac address involved in the event. In other words, for every mac address that appears in the logs, we construct a sequence of events in which it is involved. Thus, for a dataset where m mac addresses are seen, m sequences are constructed and processed. 
+
+Formally, given a large but unlabeled set S of logs, we need to construct a model that is able to detect abnormal sequences in the new logs.
+Specifically, we are interested in detecting abnormal sequences of network events.
+
+In this context, analysing log sequences is particularly challenging since sequences show unequal lenght not know in advance.
+Sequences describe an ordered series of events; thus the order is important and and it must be considered to detect any eventual issue.
+This task is particularly challenging since sequences can be interaleave. This is probably due to a high concurrency of several processes manipulating the different state machines of clients and APs that can run in parallel.
+Finally, logs can be very noise because of periodic events and or because of misconfigurations or even errors unrelated to wireless. These entries 
+in the log sequences can be considered as noise and they must filtered out... 
+
+
 
 
 
 \section{Model and Methodology}
+
+In order to learn from logs and detect and classify anomaly, we built the processing pipeline shown in Fig.~\ref{fig:pipeline}
+\begin{figure}[tb]
+  \centering
+  \includegraphics[width=1.00\columnwidth]{./figures/pipeline.png}.
+  \caption{Processing pipeline}
+  \label{fig:sw_fabric}
+\end{figure}
+The figure is explained in detail in the following subsections. For several of these steps we describe different approaches we considered. 
+At a high level, we preprocess the logs in order to remove some noise and indetify requrerent and significant patterns. These patterns then constitute the features of our learning algorithm. 
+At run time, logs are then collected and fed to the machine learning algorithm that detects if these logs contain anomalies. 
+
+\subsection{Preprocessing phase}
+
+When anlyzing logs, the first issues is to identify some structure in the log format and how logs relate to sequece of temporal and casual events.
+First, we consider that every log entry represents a specific \emph{action} $a$ taken by the WLC when a specific network \emph{event} $e$ occurs.
+For instance, in the case of the a client join event, WLC take several actions, like parsing of the 802.11 frame, extraction of its mac address etc.
+An event $e_j$ is then a collection of WLC actions $a_x$.
+
+A log entry \textbf{\textit{x}} for an action \(a_x\) consists of a timestamp \(t_x\), a list of mac addresses \(d_x\) of the involved devices 
+and a message. Mac address usually belongs clients' or APs' intergace(s). The message is usually a
+human readable string describing the particular WLC action.
+In the preprocessing phase, we assign a unique identifier \(m_x\) to each possible log message.
+
+An action \(a_x\) is thus defined as the tuple containing the timestamp, the mac address list and the event ID corresponding to the log entry $x$:
+\[a_x = (t_x, d_{1x}, m_x)\]
+We also denote the ordered sequence $s$ of $n$ consecutive actions by:
+\[s = <a_1,a_2, \dots, a_n>\]
+
+During the preprocessing phase we try to isolate the series of actions $s_e$ that describe a specific network event $e$. Since usually network events 
+are described as a set of actions involving specific network devices, we filter log entries accordingly to their mac address.
+As such, we end with a sequence of raw logs, each of them containing the event related to a specific device.
+We label this log as \emph{device-filtered} log.
+
+
+
 \subsection{Pattern discovery}
-In the context of this work, pattern discovery basically aims at finding interesting relations among the variables in the large log data. To the best of our knowledge, none of the previous works described in sec.\ref{sec:related} combine the results of the pattern discovery solutions with any learning algorithm to train a machine to understand the data.
-The approach taken here is to adopt discovered patterns instead of traditional features in the learning phase. 
-Patterns have to be of frequently correlated and mutually dependent events, such that, in the presence of issues, a clear cause-effect determinism can be underlined. 
-This decision allows for dimensionality reduction and human readability.
+Multiple network events can appear in a device-filtered log sequence.
+The problem is then to isolate the sequence of actions that belongs to a specific network event involving a specific device.
+This become then a pattern discovery problem. Usually Pattern discovery basically aims at finding interesting relations among
+the variables in the large log data. Given a sequence of actions representing a log \(s\), we want to extract several sub-subsequences $s_j$ representing
+meaningful and isolated sequences of actions related to the j-th event $e$.
+Once interesting patterns are discovered we used them as feature during the learning phase.
+To the best of our knowledge, none of the previous works described in sec.\ref{sec:related}
+combine the results of the pattern discovery solutions with any learning algorithm to train a machine to understand the data.
+
+Patterns have to be of frequently correlated and mutually dependent events, such that, in the presence of issues,
+a clear cause-effect determinism can be underlined.  This decision allows for dimensionality reduction and human readability.
 Indeed, one of the wanted outcome of this work is highlighting sequences of interesting (i.e. problematic) logs to humans in order to help better debugging.
 
 % Our hypothesis is that if we use the discovered patterns instead of using the traditional features only in the learning process we will get better results. Hence, after the preprocessing phase and just before the learning phase we add a pattern discovery step.
-The following subsections describe the problem and two algorithms adopted in this work to address it.  
-\subsubsection{Finding patterns in wireless controller logs}
-The training data is a dataset \(S\) of event sequences. Each sequence belongs to a device ID and a specific time interval, while each event consists of a timestamp and a message ID. The pattern definition in this work is a subsequence of message IDs that appear in the sequences of \(S\).% The goal is to identify all patterns in the dataset having some predefined characteristics. 
+We explore two different approaches to extract patter information in the device-filtered logs. These approches are descibed in \ref{ss:pattern1} and \ref{ss:pattern2}.
+\subsubsection{Finding patterns in wireless controller logs}\label{ss:pattern1}
+
+The training data is a dataset \(S\) of event Each sequence belongs to a device ID and a specific time interval, while each event consists of a timestamp and a message ID. The pattern definition in this work is a subsequence of message IDs that appear in the sequences of \(S\).% The goal is to identify all patterns in the dataset having some predefined characteristics. 
 The mentioned concurrency and noise specifications of the log sequences hinder the pattern discovery task since the events of the same pattern might not be contiguous: e.g. noisy or concurrent events might overlap with the pattern to be discovered. This means that all the events of a pattern will not always appear in the same relative positions to each other.
-\subsubsection{Sequential-Pattern Discovery}
+
+\subsubsection{Sequential-Pattern Discovery}\label{ss:pattern2}
 The first algorithm adopted to find patterns is based on the sequential rule mining (SRM) algorithm \cite{algorithms}.
 However, since this algorithm discovers the frequent correlated patterns only, it has been modified in order to cover the infrequent mutually dependent patterns as well. 
 Originally, the original algorithm discovers patterns having a given minimum support and confidence \(minSup\) and \(minConf\) respectively.
