@@ -443,13 +443,50 @@ iv) Pattern frequency: This feature is also similar to the term frequency, howev
 \item Deletion: remove any character (event ID) from the string (sequence)
 \item Substitution: replace any character (event ID) with any other character (event ID)
 \end{itemize}
-\textbf{3) The hybrid distance method:} This method basically combines the first two approaches together. In order to merge the two methods, we introduce a distance metric that measures the dissimilarity among the  feature vectors of the sequences. The euclidean distance was our choice in this project. Then, the hybrid distance is computed by taking the average of the normalized euclidean and edit distances. 
+\textbf{3) The hybrid distance method:} This method basically combines the first two approaches together. In order to merge the two methods, we introduce a distance metric that measures the dissimilarity among the  feature vectors of the sequences. The euclidean distance was our choice in this project. Then, the hybrid distance is computed by taking a weighted average of the normalized euclidean and edit distances. 
 
 \subsection{Learning algorithm}
-
-
+Since in our setup labeled data is unavailable, an unsupervised anomaly detection model was used. Thus our choice of the learning algorithm was restricted by this constraint. In other words, the machine learns from an unlabeled dataset with an assumption that the majority of the samples in the training data are regular behaviors. Then, the machine should be able to differentiate between regular and abnormal behaviors. One of the most widely used algorithms in unsupervised anomaly detection is the Density-based spatial clustering of applications with noise (DBSCAN) proposed in 1996 [38,39]. As its name says, it clusters the data based on its density distribution. It imitates the common method used by human to group points in high density areas in the space together. Given data points in some space, DBSCAN groups neighbor points in high-density regions, whereas it labels points in low-density regions as outliers. It is designed to be resilient to noise and discover arbitrary shaped clusters. Furthermore, the algorithm does not require pre-knowledge of the number of clusters. Instead, it requires defining two parameters:
+\begin{itemize}
+\item MinPts: a parameter to define high density, i.e. the minimum number of points a region should have to be considered high dense.
+\item Eps: a parameter to define points’ closeness to each other, i.e. the maximum distance between two neighbor points.
+\end{itemize}
+In this project, Eps is considered the discrimination factor that controls the tolerance/aggression of the anomaly detection model. For instance, for low Eps values samples that are slightly deviated from the high density regions will be considered as outliers and hence anomalies.  On the other hand for high Eps values, the model tolerates big differences. 
 
 \section{Testing and Results}
+\subsection{Experiments}
+The first step to test our solution was to collect big but unlabeled data for training. The training data was collected in a period of two weeks (10 working days) from an enterprise network consisting of 2 wireless controllers, 9 APs and 42 connected devices. In total,  4.5 million log entries were gathered. Approximately 2000 different messages were spotted in these log entries.
+
+In order to evaluate the performance of the trained anomaly detection models, we had to generate labeled dataset. The test set contained both normal and abnormal data instances so as to avoid biased evaluation. Furthermore, we made sure that the testing data reflects the behavior of a variety of devices. Samsung and Apple phones, laptops running Windows and Mac OS and a raspberry pi running a Linux OS were used to generate the testing data. 
+
+For the normal testing data, we collected the network logs during the regular daily operation then the data was inspected, sanitized and labeled as normal data manually. Moreover, we added normal but not very frequent behaviors by artificially stimulating the corresponding scenarios. Some major normal behavior scenarios covered by the normal test set are network user connecting, disconnecting, going out of the reachable range, roaming, successfully authenticating and inserting wrong credentials.
+
+As for the anomalous test set, we manually created and triggered different anomalies on both sides, the network and the user's device. We list the major anomalies  covered:
+
+\begin{itemize}
+\item Unreachable aaa server: the link between the WLC and the authentication, authorization and accounting server is down.
+\item Unreachable gateway: the link between the WLC and the gateway is down.
+\item Shortage of IP addresses: there are more clients than the available IP addresses in the DHCP pool.
+\item Deauthentication attack: a malicious device sends deauthentication packets on behalf of other clients.
+\item Password brute force attack: a malicious user tries to guess the credentials of another user.
+\end{itemize}
+\subsection{Metrics}
+Since the data suffers from the class imbalance problem, where the classes are not equally represented, error rate and accuracy are not good metrics to evaluate the model. Instead, ROC (receiver operating characteristic) and F-score, the most popular evaluation methods to avoid the class imbalance problem, are used [30].  
+\subsection{Models}
+In this section, we discuss the different models to be compared. First we recall the three sequence learning methods: feature creation vs.  sequence-to-sequence distance vs. hybrid approach. Using the feature creation method, different combinations of features create different learning models. In this paper, we list the best four models that use the feature creation method. We define all the models to be evaluated, below:
+\begin{itemize}
+\item \textbf{SP}: Uses the feature creation method, with the sequential pattern frequency (patterns derived for Algorithm 1) as features
+\item \textbf{IP}: Uses the feature creation method, with the interesting pattern frequency (patterns derived for Algorithm 2) as features
+\item \textbf{Bigram}: Uses the feature creation method, with the N-gram frequency (with N=2) as features
+\item \textbf{Event}: Uses the feature creation method, with the term frequency as features
+\item \textbf{Distance}: Uses the sequence-to-sequence distance method
+\item \textbf{Hybrid\_SP\_x}: Uses the hybrid combination between the Distance and SP models with the weights x and 1-x respectively
+\item \textbf{Hybrid\_IP\_x}: Uses the hybrid combination between the Distance and IP models with the weights x and 1-x respectively
+\end{itemize}
+\subsection{Evaluation}
+
+
+
 \section{Conclusions}
 Stress main idea. Usage and impact. Alternatives and future work.\\
 Usage: Network monitor, debugging tool, assess log system\\
